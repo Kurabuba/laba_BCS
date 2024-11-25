@@ -1,0 +1,37 @@
+#!/bin/bash
+
+check() {
+    dir=$1
+    limit=$2  
+    use=$(df "$dir" --output=pcent | tail -n 1 | tr -d '% ')
+    if [ "$use" -gt "$limit" ]; then
+        echo "Использование пространства на '$dir' составляет $use%. Это превышает $limit%."
+    else
+        echo "Использование пространства на '$dir' составляет $use%."
+    fi
+}
+
+if [ "$#" -ne 2 ]; then
+    echo "Использование: $0 <директория> <процент>"
+    exit 1 
+fi
+
+dir=$1 
+limit=$2
+
+if [ ! -d "$dir" ]; then
+	echo "'$dir' не директория"
+	exit 1
+fi
+
+if ! [[ "$limit" =~ ^[0-9]+$ ]]; then
+	echo "Порог должен быть больше нуля"
+	exit 1
+fi
+
+if [ "$limit" -gt 100 ];then
+	echo "Порог не должен превышать 100"
+	exit 1
+fi
+
+check "$dir" "$limit"
